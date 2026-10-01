@@ -3,426 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Woven Grain — k-eis</title>
+<title>Water Surface — k-eis</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-
 :root {
-  /* Woven Grain：ベージュ2テーマのみ。デフォルトは晒し布×真鍮 */
-  --bg: #f6f1e7;
-  --ink: #332b1f;
-  --line: #ddd0b8;
-  --line-strong: #c2b394;
-  --accent: #c9a876;
-  --accent2: #a68a5c;
-  --muted: #7a705f;
-  --on-accent: #14140f;
-  --canvas-check-a: #efe7d8;
-  --canvas-check-b: #f6f1e7;
-  --mono: 'Courier New', monospace;
-  --sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  /* Asagiri（朝霧）：既定。淡い青灰×深い水色 */
+  --bg:#eef1f0; --ink:#1f2a2e; --line:#d3dcdb; --line-strong:#aebdbd;
+  --accent:#4f7f8f; --on-accent:#f4f8f8; --muted:#6c7c80;
+  --check-a:#e3e9e8; --check-b:#eef1f0;
+  --mono:'Courier New',monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
 }
-
-/* ── THEME: TOUKI（陶器×抹茶） ── */
-body.theme-touki {
-  --bg: #f4efe4;
-  --ink: #2f2a20;
-  --line: #cdbfa0;
-  --line-strong: #b8a67e;
-  --accent: #6b7a4f;
-  --accent2: #56613f;
-  --muted: #7d7462;
-  --on-accent: #f4efe4;
-  --canvas-check-a: #eae2d2;
-  --canvas-check-b: #f4efe4;
+/* Fukami（深み） */
+body.theme-fukami {
+  --bg:#0f1a1f; --ink:#dfe8e8; --line:#22343b; --line-strong:#35505a;
+  --accent:#6fb0c4; --on-accent:#0b1418; --muted:#8aa0a6;
+  --check-a:#14232a; --check-b:#0f1a1f;
 }
-
-html, body { background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; transition: background 0.2s, color 0.2s; }
-
-/* ── テーマ切り替え ── */
-.theme-switcher {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--line);
-  flex-wrap: wrap;
-}
-.theme-label {
-  font: 500 9px/1 var(--mono);
-  color: var(--muted);
-  letter-spacing: 0.1em;
-  white-space: nowrap;
-}
-.theme-options { display: flex; gap: 6px; flex-wrap: wrap; }
-.theme-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px 6px 6px;
-  border: 1px solid var(--line-strong);
-  background: transparent;
-  color: var(--ink);
-  font: 500 9.5px/1 var(--sans);
-  cursor: pointer;
-  transition: all 0.12s;
-}
-.theme-btn:hover { border-color: var(--accent); }
-.theme-btn.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.theme-btn .swatch { width: 14px; height: 14px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-
-.wrap { max-width: 1180px; margin: 0 auto; padding: 40px 32px 80px; }
-
-header { border-bottom: 1px solid var(--line-strong); padding-bottom: 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
-.filter-tag { font: 600 10px/1 var(--mono); color: var(--accent); letter-spacing: 0.16em; margin-bottom: 10px; }
-h1 { font: 300 32px/1.1 var(--sans); letter-spacing: -0.01em; }
-h1 .jp { font-size: 15px; color: var(--muted); font-weight: 400; margin-left: 10px; }
-.tagline { font: 400 12px/1.6 var(--sans); color: var(--muted); margin-top: 6px; }
-.private-badge { font: 700 9px/1 var(--mono); color: var(--accent); letter-spacing: 0.08em; margin-top: 8px; border: 1px dashed var(--accent); display: inline-block; padding: 3px 7px; }
-.version { font: 400 9px/1 var(--mono); color: var(--muted); letter-spacing: 0.1em; text-align: right; }
-
-.stage { display: grid; grid-template-columns: 1fr 300px; gap: 0; border: 1px solid var(--line-strong); }
-
+html,body { background:var(--bg); color:var(--ink); font-family:var(--sans); min-height:100vh; transition:background .2s,color .2s; }
+.wrap { max-width:1180px; margin:0 auto; padding:40px 32px 80px; }
+header { border-bottom:1px solid var(--line-strong); padding-bottom:22px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:flex-end; }
+.filter-tag { font:600 10px/1 var(--mono); color:var(--accent); letter-spacing:.16em; margin-bottom:10px; }
+h1 { font:300 32px/1.1 var(--sans); letter-spacing:-.01em; }
+h1 .jp { font-size:15px; color:var(--muted); font-weight:400; margin-left:10px; }
+.tagline { font:400 12px/1.6 var(--sans); color:var(--muted); margin-top:6px; }
+.version { font:400 9px/1 var(--mono); color:var(--muted); letter-spacing:.1em; text-align:right; }
+.theme-switcher { display:flex; align-items:center; gap:16px; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.theme-label { font:500 9px/1 var(--mono); color:var(--muted); letter-spacing:.1em; }
+.theme-options { display:flex; gap:6px; }
+.theme-btn { display:flex; align-items:center; gap:6px; padding:6px 10px 6px 6px; border:1px solid var(--line-strong); background:transparent; color:var(--ink); font:500 9.5px/1 var(--sans); cursor:pointer; }
+.theme-btn:hover { border-color:var(--accent); }
+.theme-btn.active { background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+.swatch { width:14px; height:14px; border-radius:50%; flex-shrink:0; }
+.stage { display:grid; grid-template-columns:1fr 300px; border:1px solid var(--line-strong); }
 .canvas-area {
-  position: sticky;
-  top: 20px;
-  align-self: start;
-  background:
-    linear-gradient(45deg, var(--canvas-check-a) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--canvas-check-a) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--canvas-check-a) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--canvas-check-a) 75%);
-  background-color: var(--canvas-check-b);
-  background-size: 16px 16px;
-  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
-  border-right: 1px solid var(--line-strong);
-  min-height: 480px;
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column;
-  gap: 14px;
-  overflow: hidden;
-  padding: 20px;
+  position:sticky; top:20px; align-self:start; min-height:480px; padding:20px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+  background:linear-gradient(45deg,var(--check-a) 25%,transparent 25%),linear-gradient(-45deg,var(--check-a) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--check-a) 75%),linear-gradient(-45deg,transparent 75%,var(--check-a) 75%);
+  background-color:var(--check-b); background-size:16px 16px; background-position:0 0,0 8px,8px -8px,-8px 0;
+  border-right:1px solid var(--line-strong);
 }
-
-.dual-drop { display: flex; gap: 10px; width: 100%; max-width: 420px; }
-.mini-drop {
-  flex: 1; aspect-ratio: 1; border: 1.5px dashed var(--line-strong); cursor: pointer;
-  display: flex; align-items: center; justify-content: center; text-align: center;
-  background-size: cover; background-position: center; position: relative;
-}
-.mini-drop.filled { border-style: solid; }
-.mini-drop .mini-label { font: 500 10px/1.4 var(--sans); color: var(--muted); padding: 6px; }
-.mini-drop.filled .mini-label { position: absolute; bottom: 4px; left: 4px; right: 4px; color: #f0ede0; background: rgba(0,0,0,0.5); padding: 2px 4px; font-size: 9px; }
-.mini-drop input[type=file] { display: none; }
-.mini-drop .preview-canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
-.mini-drop.filled .preview-canvas { display: block; }
-
-#outputStage{position:relative;width:min(100%,700px);margin:0 auto;display:flex;justify-content:center;align-items:center}
-#outputStage canvas{width:100%;height:auto}
-.play-overlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;min-width:190px;padding:18px 26px 16px;border:1px solid rgba(255,255,255,.72);background:rgba(18,18,18,.82);color:#fff;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);cursor:pointer;text-align:center;letter-spacing:.12em}
-.play-overlay span{display:block;font:700 12px/1.2 var(--sans)}
-.play-overlay small{display:block;margin-top:7px;font:500 9px/1.2 var(--sans);letter-spacing:.06em;opacity:.72}
-.play-overlay:disabled{opacity:.28;cursor:default}
-.play-overlay:not(:disabled):hover{background:rgba(18,18,18,.92)}
-canvas#outputCanvas { max-width: 100%; max-height: 560px; display: block; }
-.canvas-badge { position: absolute; top: 14px; left: 14px; font: 500 9px/1 var(--mono); color: #f0ede0; background: rgba(0,0,0,0.45); padding: 4px 8px; border: 1px solid rgba(255,255,255,0.15); letter-spacing: 0.08em; display: none; }
-.hint { font: 400 9px/1.6 var(--mono); color: var(--muted); text-align: center; letter-spacing: 0.06em; }
-
-.controls { background: var(--bg); padding: 22px 20px; display: flex; flex-direction: column; gap: 0; }
-.ctrl-group { padding: 16px 0; border-bottom: 1px solid var(--line); }
-.ctrl-group:first-child { padding-top: 0; }
-.ctrl-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
-.ctrl-label .name { font: 500 10px/1 var(--sans); color: var(--ink); letter-spacing: 0.02em; }
-.ctrl-label .name .jp-small { font-size: 9px; color: var(--muted); margin-left: 4px; }
-.ctrl-label .val { font: 500 10px/1 var(--mono); color: var(--accent); }
-
-input[type="range"] { -webkit-appearance: none; width: 100%; height: 3px; background: var(--line-strong); outline: none; cursor: pointer; }
-input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: transform 0.1s; }
-input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
-input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: none; cursor: pointer; }
-
-.select-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px; }
-.select-btn { border: 1px solid var(--line-strong); padding: 8px 6px; cursor: pointer; text-align: center; font: 600 10px/1.3 var(--sans); color: var(--ink); transition: all 0.12s; }
-.select-btn:hover { border-color: var(--accent); }
-.select-btn.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-
-.action-buttons { display: flex; gap: 8px; }
-.btn { flex: 1; padding: 12px; border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent); font: 600 11px/1 var(--sans); letter-spacing: 0.04em; cursor: pointer; }
-.btn:disabled { opacity: 0.3; cursor: not-allowed; }
-.btn.secondary { background: transparent; color: var(--ink); border-color: var(--line-strong); }
-
-.mini-drop-c { border: 1.5px dashed var(--line-strong); cursor: pointer; padding: 14px; text-align: center; font: 500 10px/1.4 var(--sans); color: var(--muted); background-size: cover; background-position: center; position: relative; min-height: 60px; display: flex; align-items: center; justify-content: center; }
-.mini-drop-c.filled .mini-label { color: #f0ede0; background: rgba(0,0,0,0.5); padding: 2px 6px; }
-.mini-drop-c input[type=file] { display: none; }
-
-#saveOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
-#saveOverlay img { max-width: 92%; max-height: 70%; border: 1px solid var(--line-strong); margin-bottom: 16px; }
-#saveOverlay p { font-size: 13px; color: var(--ink); margin: 4px 0; }
-#saveOverlay .closeBtn { margin-top: 20px; font-size: 12px; color: var(--muted); border: 1px solid var(--line-strong); padding: 8px 16px; display: inline-block; cursor: pointer; }
-
-@media (max-width: 860px) {
-  .wrap { padding: 20px 16px 50px; }
-  header { flex-direction: column; align-items: flex-start; gap: 10px; padding-bottom: 16px; margin-bottom: 20px; }
-  h1 { font-size: 24px; }
-  h1 .jp { display: block; margin-left: 0; margin-top: 4px; }
-  .stage { grid-template-columns: 1fr; border: none; }
-  /* Mobile: keep Photo A/B previews compact so their controls remain easy to reach. */
-  .dual-drop { max-width: 300px; gap: 8px; }
-  .mini-drop { max-width: 146px; }
-  .canvas-area { border: 1px solid var(--line-strong); border-bottom: none; min-height: 220px; top: 0; z-index: 20; }
-  canvas#outputCanvas { max-height: 42vh; }
-  .controls { border: 1px solid var(--line-strong); border-top: none; padding: 18px 16px; }
-  input[type="range"] { height: 4px; margin: 8px 0; }
-  input[type="range"]::-webkit-slider-thumb { width: 22px; height: 22px; }
-  input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; }
-  .btn { padding: 16px; font-size: 12px; }
-  .select-btn { padding: 12px 6px; font-size: 11px; }
-}
-.profile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:7px}
-.profile-btn{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--muted);border-radius:6px;padding:7px 4px 6px;cursor:pointer;font:inherit;min-width:0;transition:.15s ease}
-.profile-btn svg{display:block;width:100%;height:32px;margin-bottom:3px}
-.profile-btn span{display:block;font-size:8px;letter-spacing:.04em}
-.profile-btn:hover{border-color:var(--accent);color:var(--text)}
-.profile-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
-.profile-btn:focus-visible{outline:1px solid var(--accent);outline-offset:2px}
-@media(max-width:700px){
-  .profile-grid{grid-template-columns:repeat(2,1fr)}
-  .dual-drop{max-width:270px;gap:7px}
-  .mini-drop{aspect-ratio:1;flex:none;width:calc((100% - 7px) / 2)}
+canvas#outputCanvas { max-width:100%; max-height:560px; display:block; cursor:pointer; }
+.hint { font:400 9px/1.6 var(--mono); color:var(--muted); text-align:center; letter-spacing:.06em; }
+#fileInput { display:none; }
+.controls { background:var(--bg); padding:22px 20px; }
+.ctrl-group { padding:16px 0; border-bottom:1px solid var(--line); }
+.ctrl-group:first-child { padding-top:0; }
+.ctrl-label { display:flex; justify-content:space-between; align-items:baseline; margin:10px 0 8px; }
+.ctrl-label:first-child { margin-top:0; }
+.ctrl-label .name { font:500 10px/1 var(--sans); }
+.ctrl-label .jp-small { font-size:9px; color:var(--muted); margin-left:4px; }
+.ctrl-label .val { font:500 10px/1 var(--mono); color:var(--accent); }
+.section-title { font:600 9px/1 var(--mono); color:var(--muted); letter-spacing:.08em; }
+input[type=range] { -webkit-appearance:none; width:100%; height:3px; background:var(--line-strong); outline:none; cursor:pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:var(--accent); }
+input[type=range]::-moz-range-thumb { width:14px; height:14px; border-radius:50%; background:var(--accent); border:none; }
+.check { display:flex; align-items:center; gap:8px; cursor:pointer; font:500 10px/1.3 var(--sans); }
+.check input { width:16px; height:16px; accent-color:var(--accent); }
+.action-buttons { display:flex; gap:8px; }
+.btn { flex:1; padding:12px; border:1px solid var(--accent); background:var(--accent); color:var(--on-accent); font:600 11px/1 var(--sans); letter-spacing:.04em; cursor:pointer; }
+.btn:disabled { opacity:.3; cursor:not-allowed; }
+.btn.secondary { background:transparent; color:var(--ink); border-color:var(--line-strong); }
+.footer-links { display:flex; flex-direction:column; gap:12px; margin-top:16px; }
+.footer-links a { display:block; text-align:center; padding:16px; border:1px solid var(--line-strong); font:600 12px/1 var(--sans); letter-spacing:.06em; color:var(--ink); text-decoration:none; }
+#saveOverlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:100; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center; }
+#saveOverlay img { max-width:92%; max-height:70%; margin-bottom:16px; }
+#saveOverlay p { font-size:13px; color:#ddd; }
+#saveOverlay .closeBtn { margin-top:20px; font-size:12px; color:#aaa; border:1px solid #666; padding:8px 16px; cursor:pointer; }
+@media (max-width:860px) {
+  .wrap { padding:20px 16px 50px; }
+  header { flex-direction:column; align-items:flex-start; gap:10px; padding-bottom:16px; margin-bottom:20px; }
+  h1 { font-size:24px; } h1 .jp { display:block; margin:4px 0 0; }
+  .stage { grid-template-columns:1fr; border:none; }
+  .canvas-area { border:1px solid var(--line-strong); border-bottom:none; min-height:220px; top:0; z-index:20; }
+  canvas#outputCanvas { max-height:42vh; }
+  .controls { border:1px solid var(--line-strong); border-top:none; padding:18px 16px; }
+  input[type=range] { height:4px; margin:8px 0; }
+  input[type=range]::-webkit-slider-thumb { width:22px; height:22px; }
+  input[type=range]::-moz-range-thumb { width:22px; height:22px; }
+  .btn { padding:16px; font-size:12px; }
 }
 </style>
 </head>
 <body>
-
 <div class="wrap">
   <header>
     <div>
-      <div class="filter-tag">k-eis DESIGN FILTER 007</div>
-      <h1>Woven Grain <span class="jp">編まれた粒子</span></h1>
-      <div class="tagline">Two photos are woven together, like a basket.</div>
-      <div class="tagline" style="margin-top:2px; opacity:0.85;">2枚の写真を、網籠のように編み込む。</div>
+      <div class="filter-tag">k-eis DESIGN FILTER 008</div>
+      <h1>Water Surface <span class="jp">水面</span></h1>
+      <div class="tagline">One angle of light. A mirror, a window, a color.</div>
+      <div class="tagline" style="margin-top:2px;opacity:.85;">一つの光が、鏡にも、窓にも、色にもなる。</div>
     </div>
     <div class="version">© 2026 k-eis studio</div>
   </header>
 
   <div class="theme-switcher">
-    <span class="theme-label">THEME <span class="jp-small">着せ替え</span></span>
+    <span class="theme-label">THEME <span style="font-family:var(--sans)">着せ替え</span></span>
     <div class="theme-options">
-      <button class="theme-btn active" data-theme="sarashi">
-        <span class="swatch" style="background:#f6f1e7; border:1px solid #c9a876;"></span>
-        Sarashi
-      </button>
-      <button class="theme-btn" data-theme="touki">
-        <span class="swatch" style="background:#f4efe4; border:1px solid #6b7a4f;"></span>
-        Touki
-      </button>
+      <button class="theme-btn active" data-theme="asagiri"><span class="swatch" style="background:#eef1f0;border:1px solid #4f7f8f;"></span>Asagiri</button>
+      <button class="theme-btn" data-theme="fukami"><span class="swatch" style="background:#0f1a1f;border:1px solid #6fb0c4;"></span>Fukami</button>
     </div>
   </div>
 
   <div class="stage">
     <div class="canvas-area">
-      <div class="dual-drop">
-        <div class="mini-drop" id="dropA">
-          <canvas class="preview-canvas" id="previewA"></canvas>
-          <span class="mini-label">Photo A<br>編み込み用</span>
-          <input type="file" id="fileA" accept="image/*">
-        </div>
-        <div class="mini-drop" id="dropB">
-          <canvas class="preview-canvas" id="previewB"></canvas>
-          <span class="mini-label">Photo B<br>編み込み用</span>
-          <input type="file" id="fileB" accept="image/*">
-        </div>
-      </div>
-      <div class="output-stage" id="outputStage">
-        <canvas id="outputCanvas" width="700" height="500"></canvas>
-        <button class="play-overlay" id="playOverlayBtn" disabled>
-          <span>PLAY WEAVE</span>
-          <small>2枚の写真を編み始める</small>
-        </button>
-      </div>
-      <div class="hint" id="canvasHint">PHOTO A / PHOTO B をアップロードしてください</div>
+      <canvas id="outputCanvas" width="900" height="600"></canvas>
+      <div class="hint" id="canvasHint">画像をクリックして写真を選択 / Click the image to select a photo</div>
+      <input type="file" id="fileInput" accept="image/*">
     </div>
 
     <div class="controls">
       <div class="ctrl-group">
-        <div class="ctrl-label"><span class="name">BASIC PARAMETERS <span class="jp-small">基本設定</span></span></div>
+        <div class="ctrl-label"><span class="section-title">WAVE STRUCTURE <span class="jp-small" style="font-family:var(--sans)">波の構造</span></span></div>
+
+        <div class="ctrl-label"><span class="name">WAVE SCALE <span class="jp-small">うねりの大きさ</span></span><span class="val" id="waveScaleVal">50</span></div>
+        <input type="range" id="waveScale" min="0" max="100" value="50">
+
+        <div class="ctrl-label"><span class="name">RIPPLE TEXTURE <span class="jp-small">さざ波の細かさ</span></span><span class="val" id="rippleVal">40</span></div>
+        <input type="range" id="ripple" min="0" max="100" value="40">
+
+        <div class="ctrl-label"><span class="name">WAVE DIRECTION <span class="jp-small">波の方向</span></span><span class="val" id="waveDirVal">0°</span></div>
+        <input type="range" id="waveDir" min="0" max="359" value="0">
+
+        <div class="ctrl-label"><span class="name">WAVE AMPLITUDE <span class="jp-small">波の高さ</span></span><span class="val" id="waveAmpVal">50</span></div>
+        <input type="range" id="waveAmp" min="0" max="100" value="50">
       </div>
 
       <div class="ctrl-group">
-        <div class="ctrl-label">
-          <span class="name">MESH SIZE <span class="jp-small">網目の幅</span></span>
-          <span class="val" id="meshVal">40</span>
-        </div>
-        <input type="range" id="mesh" min="8" max="100" value="40">
-        <div class="ctrl-label" style="margin-top:10px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">STRAND LENGTH <span class="jp-small">帯の連続性</span></span>
-          <span class="val" id="strandLengthVal">1</span>
-        </div>
-        <input type="range" id="strandLength" min="1" max="4" value="1" step="1">
-        <label style="display:flex; align-items:center; gap:8px; margin-top:12px; cursor:pointer;">
-          <input type="checkbox" id="zoomWithMesh" style="width:16px; height:16px; accent-color:var(--accent);">
-          <span class="name" style="font-size:9px; color:var(--muted);">ZOOM WITH MESH <span class="jp-small">網目の幅で写真サイズも変える</span></span>
-        </label>
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label"><span class="name">DIRECTION <span class="jp-small">編み込みの方向</span></span></div>
-        <div class="select-grid">
-          <div class="select-btn" data-direction="stripe">Stripe</div>
-          <div class="select-btn active" data-direction="basket">Basket</div>
-          <div class="select-btn" data-direction="diagonal">Diagonal</div>
-        </div>
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label"><span class="name">PHOTO ADJUSTMENTS <span class="jp-small">写真ごとの調整</span></span></div>
-        <div class="ctrl-label" style="margin-top:2px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">PHOTO A</span>
-        </div>
-        <div class="ctrl-label" style="margin-bottom:4px; margin-top:8px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">EXPOSURE <span class="jp-small">露出</span></span>
-          <span class="val" id="exposureAVal">0</span>
-        </div>
-        <input type="range" id="exposureA" min="-100" max="100" value="0">
-        <div class="ctrl-label" style="margin-bottom:4px; margin-top:10px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">BRILLIANCE <span class="jp-small">鮮やかさ</span></span>
-          <span class="val" id="brillianceAVal">0</span>
-        </div>
-        <input type="range" id="brillianceA" min="-100" max="100" value="0">
-
-        <div class="ctrl-label" style="margin-top:16px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">PHOTO B</span>
-        </div>
-        <div class="ctrl-label" style="margin-bottom:4px; margin-top:8px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">EXPOSURE <span class="jp-small">露出</span></span>
-          <span class="val" id="exposureBVal">0</span>
-        </div>
-        <input type="range" id="exposureB" min="-100" max="100" value="0">
-        <div class="ctrl-label" style="margin-bottom:4px; margin-top:10px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">BRILLIANCE <span class="jp-small">鮮やかさ</span></span>
-          <span class="val" id="brillianceBVal">0</span>
-        </div>
-        <input type="range" id="brillianceB" min="-100" max="100" value="0">
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label"><span class="name">CHARACTER PARAMETERS <span class="jp-small">表現の調整</span></span></div>
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label"><span class="name">SURFACE / 3D <span class="jp-small">立体表現</span></span></div>
-        <div class="ctrl-label" style="margin-top:8px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">STRAND PROFILE <span class="jp-small">帯の断面</span></span>
-        </div>
-        <div class="profile-grid" id="profileOptions">
-          <button class="profile-btn active" type="button" data-profile="round">
-            <svg viewBox="0 0 100 42" aria-hidden="true"><path d="M8 21 C22 5 78 5 92 21 C78 37 22 37 8 21 Z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M18 21 C31 12 69 12 82 21 C69 30 31 30 18 21 Z" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".55"/></svg><span>Round</span>
-          </button>
-          <button class="profile-btn" type="button" data-profile="ribbon">
-            <svg viewBox="0 0 100 42" aria-hidden="true"><path d="M8 13 L92 13 L86 29 L14 29 Z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M14 21 H86" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".55"/></svg><span>Ribbon</span>
-          </button>
-          <button class="profile-btn" type="button" data-profile="beveled">
-            <svg viewBox="0 0 100 42" aria-hidden="true"><path d="M12 14 L84 14 L92 21 L84 28 L12 28 L20 21 Z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M20 21 H84" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".55"/></svg><span>Beveled</span>
-          </button>
-          <button class="profile-btn" type="button" data-profile="flat">
-            <svg viewBox="0 0 100 42" aria-hidden="true"><rect x="9" y="16" width="82" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="3"/></svg><span>Flat</span>
-          </button>
-        </div>
-        <div class="ctrl-label" style="margin-top:12px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">RELIEF <span class="jp-small">立体量</span></span>
-          <span class="val" id="reliefVal">72%</span>
-        </div>
-        <input type="range" id="relief" min="0" max="100" value="72">
-        <div class="ctrl-label" style="margin-top:10px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">CONTACT SHADOW <span class="jp-small">接触影</span></span>
-          <span class="val" id="contactShadowVal">68%</span>
-        </div>
-        <input type="range" id="contactShadow" min="0" max="100" value="68">
-        <div class="ctrl-label" style="margin-top:10px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">SPECULAR <span class="jp-small">表面反射</span></span>
-          <span class="val" id="specularVal">24%</span>
-        </div>
-        <input type="range" id="specular" min="0" max="100" value="24">
-        <div class="ctrl-label" style="margin-top:10px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">SURFACE BEND <span class="jp-small">面のうねり</span></span>
-          <span class="val" id="surfaceBendVal">18%</span>
-        </div>
-        <input type="range" id="surfaceBend" min="0" max="100" value="18">
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label">
-          <span class="name">WEAVE DEPTH <span class="jp-small">上下関係（影の強さ）</span></span>
-          <span class="val" id="depthAmtVal">60%</span>
-        </div>
-        <input type="range" id="depthAmt" min="0" max="100" value="60">
-        <div class="ctrl-label" style="margin-top:10px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">SHADOW REACH <span class="jp-small">影の届く範囲</span></span>
-          <span class="val" id="shadowReachVal">75%</span>
-        </div>
-        <input type="range" id="shadowReach" min="0" max="100" value="75">
-        <div class="ctrl-label" style="margin-top:10px;">
-          <span class="name" style="font-size:9px; color:var(--muted);">LIGHT DIRECTION <span class="jp-small">光の方向</span></span>
-          <span class="val" id="lightDirectionVal">45°</span>
-        </div>
-        <input type="range" id="lightDirection" min="0" max="359" value="45">
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label">
-          <span class="name">GRAIN <span class="jp-small">粒子感</span></span>
-          <span class="val" id="grainVal">0%</span>
-        </div>
-        <input type="range" id="grain" min="0" max="100" value="0">
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label">
-          <span class="name">WARP <span class="jp-small">変形</span></span>
-          <span class="val" id="warpVal">0%</span>
-        </div>
-        <input type="range" id="warp" min="0" max="100" value="0">
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label">
-          <span class="name">IMPERFECTION <span class="jp-small">不均一さ</span></span>
-          <span class="val" id="imperfectionVal">15%</span>
-        </div>
-        <input type="range" id="imperfection" min="0" max="100" value="15">
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label">
-          <span class="name">DENSITY <span class="jp-small">A・Bの存在比率</span></span>
-          <span class="val" id="densityVal">50%</span>
-        </div>
-        <input type="range" id="density" min="0" max="100" value="50">
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label">
-          <span class="name">TENSION <span class="jp-small">張り具合</span></span>
-          <span class="val" id="tensionVal">50%</span>
-        </div>
-        <input type="range" id="tension" min="0" max="100" value="50">
-      </div>
-
-      <div class="ctrl-group">
-        <label class="ctrl-label" style="cursor:pointer;">
-          <span class="name">BACK LIGHT MODE <span class="jp-small">透過モード（3枚目の写真を使用）</span></span>
-          <input type="checkbox" id="backlight" style="width:16px; height:16px; accent-color:var(--accent);">
-        </label>
-        <div class="mini-drop-c" id="dropC">
-          <span class="mini-label">Photo C（透過用・背景）</span>
-          <input type="file" id="fileC" accept="image/*">
-        </div>
-        <div class="ctrl-label" style="margin-top:12px;">
-          <span class="name">LIGHT INTENSITY <span class="jp-small">光の強さ</span></span>
-          <span class="val" id="lightIntensityVal">50%</span>
-        </div>
-        <input type="range" id="lightIntensity" min="0" max="100" value="50">
+        <label class="check"><input type="checkbox" id="showHeight">SHOW HEIGHT MAP <span class="jp-small" style="color:var(--muted);font-size:9px;">波の高さを白黒で表示</span></label>
       </div>
 
       <div class="ctrl-group" style="border-bottom:none;">
@@ -430,16 +138,9 @@ input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius
           <button class="btn" id="downloadBtn" disabled>SAVE AS PNG</button>
           <button class="btn secondary" id="resetBtn">RESET</button>
         </div>
-        <div id="animationStage" style="display:none; margin-top:12px; text-align:center; font:600 10px/1.4 var(--sans); letter-spacing:0.12em; color:var(--ink); opacity:.72;">
-          <span id="animationStageLabel">INPUT</span>
-          <span id="animationStageProgress">0%</span>
-        </div>
-      </div>
-
-      <div class="ctrl-group" style="border-bottom:none;">
-        <div style="display:flex; flex-direction:column; gap:12px;">
-          <a href="https://keis01.substack.com/p/k-eis-design-filter-000?r=87bvw8&utm_medium=ios" style="display:block; text-align:center; padding:16px; border:1px solid var(--line-strong); font:600 12px/1 var(--sans); letter-spacing:0.06em; color:var(--ink); text-decoration:none;">PHILOSOPHY &bull; USAGE &bull; LICENSE</a>
-          <a href="https://keis01.substack.com/s/k-eis-design-filter" style="display:block; text-align:center; padding:16px; border:1px solid var(--line-strong); font:600 12px/1 var(--sans); letter-spacing:0.06em; color:var(--ink); text-decoration:none;">ALL FILTERS</a>
+        <div class="footer-links">
+          <a href="https://keis01.substack.com/p/k-eis-design-filter-000?r=87bvw8&utm_medium=ios" target="_blank" rel="noopener">PHILOSOPHY &bull; USAGE &bull; LICENSE</a>
+          <a href="https://keis01.substack.com/s/k-eis-design-filter" target="_blank" rel="noopener">ALL FILTERS</a>
         </div>
       </div>
     </div>
@@ -452,6 +153,6 @@ input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius
   <div class="closeBtn" id="saveOverlayClose">閉じる</div>
 </div>
 
-<script src="woven-grain.js"></script>
+<script src="water-surface.js"></script>
 </body>
 </html>
