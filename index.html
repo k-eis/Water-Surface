@@ -117,7 +117,7 @@ input[type=range]::-moz-range-thumb { width:14px; height:14px; border-radius:50%
         <div class="mini-drop" id="dropBelow"><span class="mini-label">水底の写真<br>透けて見える景色</span><input type="file" id="fileBelow" accept="image/*"></div>
       </div>
       <canvas id="outputCanvas" width="900" height="600"></canvas>
-      <div class="hint" id="canvasHint">2枚を選ぶと、水面と水底が重なります（片方だけでも動きます）</div>
+      <div class="hint" id="canvasHint">水面の写真は水平線より上に、水底の写真は水の中に使われます（片方だけでも動きます）</div>
     </div>
 
     <div class="controls">
@@ -135,6 +135,27 @@ input[type=range]::-moz-range-thumb { width:14px; height:14px; border-radius:50%
 
         <div class="ctrl-label"><span class="name">WAVE AMPLITUDE <span class="jp-small">波の高さ</span></span><span class="val" id="waveAmpVal">50</span></div>
         <input type="range" id="waveAmp" min="0" max="100" value="50">
+        <div class="ctrl-label"><span class="name">WAVE SPEED <span class="jp-small">流れの速さ</span></span><span class="val" id="waveSpeedVal">0</span></div>
+        <input type="range" id="waveSpeed" min="0" max="100" value="0">
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label"><span class="section-title">REFLECTION <span class="jp-small" style="font-family:var(--sans)">水平線</span></span></div>
+        <div class="ctrl-label"><span class="name">HORIZON <span class="jp-small">水平線の位置</span></span><span class="val" id="horizonVal">35</span></div>
+        <input type="range" id="horizon" min="15" max="85" value="35">
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label"><span class="section-title">LIGHT <span class="jp-small" style="font-family:var(--sans)">光</span></span></div>
+        <div class="ctrl-label"><span class="name">LIGHT DIRECTION <span class="jp-small">光の方向</span></span><span class="val" id="lightDirVal">0</span></div>
+        <input type="range" id="lightDir" min="0" max="359" value="0">
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label"><span class="section-title">WATER <span class="jp-small" style="font-family:var(--sans)">水</span></span></div>
+        <div class="ctrl-label"><span class="name">DEPTH <span class="jp-small">水深</span></span><span class="val" id="depthVal">30</span></div>
+        <input type="range" id="depth" min="0" max="100" value="30">
+        <div class="ctrl-label"><span class="name">WATER TINT <span class="jp-small">水の色味</span></span><span class="val" id="tintVal">15</span></div>
+        <input type="range" id="tint" min="0" max="100" value="15">
+        <div class="ctrl-label"><span class="name">TURBIDITY <span class="jp-small">濁り</span></span><span class="val" id="turbidityVal">20</span></div>
+        <input type="range" id="turbidity" min="0" max="100" value="20">
       </div>
 
       <div class="ctrl-group">
