@@ -9,7 +9,6 @@
 const $ = (id) => document.getElementById(id);
 const cv = $('outputCanvas');
 const ctx = cv.getContext('2d', { willReadFrequently: true });
-const fileInput = $('fileInput');
 const downloadBtn = $('downloadBtn');
 const sliders = ['waveScale', 'ripple', 'waveDir', 'waveAmp'].map($);
 
@@ -25,40 +24,31 @@ function applyTheme(key) {
 document.querySelectorAll('.theme-btn').forEach((b) => b.addEventListener('click', () => applyTheme(b.dataset.theme)));
 try { const t = localStorage.getItem('watersurface-theme'); if (t) applyTheme(t); } catch (e) {}
 
-// ── 写真（未読み込み時は空と太陽のプレースホルダー）
-let img = null;
-let source = null; // 出力サイズの ImageData
+// ── 2枚の写真：SURFACE（水面に映り込む）／BELOW（水底・透けて見える）。片方だけでも動く
+const photos = { below: null, surf: null };
+const srcData = { below: null, surf: null };
+const WATER_BASE = [38, 98, 120];   // 水底の写真がないときの水の色（WATER TINT 実装までの仮値）
 
 function seeded(i, salt) { const x = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453; return x - Math.floor(x); }
 
-function buildSource() {
-  const w = cv.width, h = cv.height;
+function coverData(im, w, h) {
   const c = document.createElement('canvas'); c.width = w; c.height = h;
   const g = c.getContext('2d');
-  if (img) {
-    const ir = img.width / img.height, cr = w / h;
-    let sw, sh, sx, sy;
-    if (ir > cr) { sh = img.height; sw = sh * cr; sx = (img.width - sw) / 2; sy = 0; }
-    else { sw = img.width; sh = sw / cr; sx = 0; sy = (img.height - sh) / 2; }
-    g.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
-  } else {
-    const grad = g.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, '#2c4a6b'); grad.addColorStop(0.55, '#e9b98a'); grad.addColorStop(1, '#f6e3c4');
-    g.fillStyle = grad; g.fillRect(0, 0, w, h);
-    for (let i = 0; i < 14; i++) { g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(((i * 97) % w), 40 + (i * 37) % (h * 0.4), 60 + (i * 13) % 80, 3); }
-    const sun = g.createRadialGradient(w * 0.5, h * 0.55, 0, w * 0.5, h * 0.55, h * 0.18);
-    sun.addColorStop(0, '#fffbe8'); sun.addColorStop(1, 'rgba(255,240,200,0)');
-    g.fillStyle = sun; g.fillRect(0, 0, w, h);
-  }
-  source = g.getImageData(0, 0, w, h);
+  const ir = im.width / im.height, cr = w / h;
+  let sw, sh, sx, sy;
+  if (ir > cr) { sh = im.height; sw = sh * cr; sx = (im.width - sw) / 2; sy = 0; }
+  else { sw = im.width; sh = sw / cr; sx = 0; sy = (im.height - sh) / 2; }
+  g.drawImage(im, sx, sy, sw, sh, 0, 0, w, h);
+  return g.getImageData(0, 0, w, h);
 }
 
 function setupCanvas() {
-  const MAX_W = 900;
-  let w = img ? img.width : 900, h = img ? img.height : 600;
-  if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
+  const ref = photos.below || photos.surf;
+  let w = ref ? ref.width : 900, h = ref ? ref.height : 600;
+  if (w > 900) { h = Math.round(h * 900 / w); w = 900; }
   cv.width = w; cv.height = h;
-  buildSource();
+  srcData.below = photos.below ? coverData(photos.below, w, h) : null;
+  srcData.surf = photos.surf ? coverData(photos.surf, w, h) : null;
 }
 
 // ── 波の合成：正弦波の重ね合わせ（解析的に傾きも求まる）
@@ -90,17 +80,19 @@ function sample(d, w, h, x, y) {                       // 双一次補間
 }
 
 function render() {
-  if (!source) return;
   const w = cv.width, h = cv.height;
   const p = { waveScale: +$('waveScale').value, ripple: +$('ripple').value, waveDir: +$('waveDir').value, waveAmp: +$('waveAmp').value };
   const waves = buildWaves(p);
   const hMax = waves.reduce((s, v) => s + v.a, 0) || 1;
   const disp = p.waveAmp / 100 * 48;                    // 傾き→ずれ(px)
   const showHeight = $('showHeight').checked;
+  const B = srcData.below, S = srcData.surf;
   const out = ctx.createImageData(w, h);
-  const o = out.data, s = source.data;
+  const o = out.data;
 
   for (let y = 0; y < h; y++) {
+    // フレネル：上（水平線側）ほど反射率が高く、手前（下）は約2%（反射と透過の混ざり具合は仮の固定カーブ）
+    const R = 0.02 + 0.98 * Math.pow(1 - y / h, 2.6);
     for (let x = 0; x < w; x++) {
       let hh = 0, gx = 0, gy = 0;
       for (let n = 0; n < waves.length; n++) {
@@ -114,8 +106,12 @@ function render() {
         const g = 127 + (hh / hMax) * 127 * (0.4 + p.waveAmp / 100 * 0.6) * 1.6;
         o[i] = o[i + 1] = o[i + 2] = g < 0 ? 0 : g > 255 ? 255 : g;
       } else {
-        const px = sample(s, w, h, x + gx * disp, y + gy * disp);
-        o[i] = px[0]; o[i + 1] = px[1]; o[i + 2] = px[2];
+        let c = B ? sample(B.data, w, h, x + gx * disp, y + gy * disp) : WATER_BASE;       // 水底（屈折でずれる）
+        if (S) {                                                                          // 水面（上下反転した映り込み）
+          const r = sample(S.data, w, h, x + gx * disp, (h - 1 - y) + gy * disp);
+          c = [c[0] * (1 - R) + r[0] * R, c[1] * (1 - R) + r[1] * R, c[2] * (1 - R) + r[2] * R];
+        }
+        o[i] = c[0]; o[i + 1] = c[1]; o[i + 2] = c[2];
       }
       o[i + 3] = 255;
     }
@@ -133,28 +129,35 @@ sliders.forEach((el) => el.addEventListener('input', () => {
 }));
 $('showHeight').addEventListener('change', requestRender);
 
-// ── 写真の読み込み
-cv.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', (e) => {
-  const f = e.target.files[0];
-  if (!f) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const im = new Image();
-    im.onload = () => {
-      img = im; setupCanvas(); render();
-      downloadBtn.disabled = false;
-      $('canvasHint').style.display = 'none';
+// ── 写真の読み込み（2つのドロップゾーン）
+function wireDrop(dropId, fileId, key) {
+  const drop = $(dropId), file = $(fileId);
+  drop.addEventListener('click', () => file.click());
+  file.addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const im = new Image();
+      im.onload = () => {
+        photos[key] = im;
+        drop.classList.add('filled');
+        drop.style.backgroundImage = `url(${ev.target.result})`;
+        setupCanvas(); render();
+        downloadBtn.disabled = false;
+      };
+      im.src = ev.target.result;
     };
-    im.src = ev.target.result;
-  };
-  reader.readAsDataURL(f);
-});
+    reader.readAsDataURL(f);
+  });
+}
+wireDrop('dropSurf', 'fileSurf', 'surf');
+wireDrop('dropBelow', 'fileBelow', 'below');
 
 // ── 保存（iOSは長押し保存オーバーレイ）
 function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; }
 downloadBtn.addEventListener('click', () => {
-  if (!img) return;
+  if (!photos.below && !photos.surf) return;
   const dataUrl = cv.toDataURL('image/png');
   if (isIOS()) {
     $('saveOverlayImg').src = dataUrl;
@@ -171,9 +174,10 @@ $('resetBtn').addEventListener('click', () => {
   $('waveScale').value = 50; $('ripple').value = 40; $('waveDir').value = 0; $('waveAmp').value = 50;
   $('showHeight').checked = false;
   sliders.forEach((el) => el.dispatchEvent(new Event('input')));
-  img = null; fileInput.value = '';
+  photos.below = photos.surf = null;
+  ['dropSurf', 'dropBelow'].forEach((id) => { $(id).classList.remove('filled'); $(id).style.backgroundImage = ''; });
+  $('fileSurf').value = ''; $('fileBelow').value = '';
   downloadBtn.disabled = true;
-  $('canvasHint').style.display = 'block';
   setupCanvas(); render();
 });
 

@@ -43,9 +43,14 @@ h1 .jp { font-size:15px; color:var(--muted); font-weight:400; margin-left:10px; 
   background-color:var(--check-b); background-size:16px 16px; background-position:0 0,0 8px,8px -8px,-8px 0;
   border-right:1px solid var(--line-strong);
 }
-canvas#outputCanvas { max-width:100%; max-height:560px; display:block; cursor:pointer; }
+canvas#outputCanvas { max-width:100%; max-height:560px; display:block; }
 .hint { font:400 9px/1.6 var(--mono); color:var(--muted); text-align:center; letter-spacing:.06em; }
-#fileInput { display:none; }
+.dual-drop { display:flex; gap:10px; width:100%; max-width:420px; }
+.mini-drop { flex:1; aspect-ratio:1.4; border:1.5px dashed var(--line-strong); cursor:pointer; display:flex; align-items:center; justify-content:center; text-align:center; background-size:cover; background-position:center; position:relative; max-height:120px; }
+.mini-drop.filled { border-style:solid; }
+.mini-label { font:500 10px/1.4 var(--sans); color:var(--muted); padding:6px; }
+.mini-drop.filled .mini-label { position:absolute; bottom:4px; left:4px; right:4px; color:#f0f4f4; background:rgba(0,0,0,.5); padding:2px 4px; font-size:9px; }
+.mini-drop input { display:none; }
 .controls { background:var(--bg); padding:22px 20px; }
 .ctrl-group { padding:16px 0; border-bottom:1px solid var(--line); }
 .ctrl-group:first-child { padding-top:0; }
@@ -107,9 +112,12 @@ input[type=range]::-moz-range-thumb { width:14px; height:14px; border-radius:50%
 
   <div class="stage">
     <div class="canvas-area">
+      <div class="dual-drop">
+        <div class="mini-drop" id="dropSurf"><span class="mini-label">水面の写真<br>映り込む景色</span><input type="file" id="fileSurf" accept="image/*"></div>
+        <div class="mini-drop" id="dropBelow"><span class="mini-label">水底の写真<br>透けて見える景色</span><input type="file" id="fileBelow" accept="image/*"></div>
+      </div>
       <canvas id="outputCanvas" width="900" height="600"></canvas>
-      <div class="hint" id="canvasHint">画像をクリックして写真を選択 / Click the image to select a photo</div>
-      <input type="file" id="fileInput" accept="image/*">
+      <div class="hint" id="canvasHint">2枚を選ぶと、水面と水底が重なります（片方だけでも動きます）</div>
     </div>
 
     <div class="controls">
