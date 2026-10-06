@@ -88,6 +88,7 @@ function render(scale = 1) {
   const d = p.depth / 100, u = p.turbidity / 100 * 0.8;
   const disp = p.waveAmp / 100 * 48 * (1 + d * 0.8);
   const hy = Math.round(p.horizon / 100 * h);
+  const mAxis = hy + Math.max(0, Math.min(1, 1 - hy / (0.15 * h))) * (0.5 * h - hy);   // 水平線15%以下で、反射の軸を中央へ寄せる（0%＝写真を上下反転して水面全体に映す）
   const tc = hsl(215 - p.tint / 100 * 180, 0.5, 0.32);               // 青→青緑→緑→茶
   const haze = tc.map((v) => v * 0.55 + 130);
   const trans = [Math.exp(-d * 3.2), Math.exp(-d * 1.2), Math.exp(-d * 0.45)]; // 赤から先に吸収
@@ -127,7 +128,7 @@ function render(scale = 1) {
             r = T[0] * trans[0] + tc[0] * mixT; g = T[1] * trans[1] + tc[1] * mixT; b = T[2] * trans[2] + tc[2] * mixT; }
           else { const k = 1 - 0.45 * d; r = tc[0] * k; g = tc[1] * k; b = tc[2] * k; }
           r = r * (1 - u) + haze[0] * u; g = g * (1 - u) + haze[1] * u; b = b * (1 - u) + haze[2] * u; // 濁り
-          if (S) { sample(S.data, w, h, x + gx * disp, 2 * hy - y + gy * disp, T);   // 映り込み（水平線で反転）
+          if (S) { sample(S.data, w, h, x + gx * disp, 2 * mAxis - y + gy * disp, T);   // 映り込み（水平線で反転）
             r = r * (1 - R) + T[0] * R; g = g * (1 - R) + T[1] * R; b = b * (1 - R) + T[2] * R; }
           const nx = -gx * slopeK, ny = -gy * slopeK;                       // きらめき：法線が光の方向を向く所
           const dt = (nx * Hx + ny * Hy + Hz) / Math.sqrt(nx * nx + ny * ny + 1);
