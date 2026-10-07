@@ -9,7 +9,7 @@ const cv = $('outputCanvas');
 const ctx = cv.getContext('2d', { willReadFrequently: true });
 const downloadBtn = $('downloadBtn');
 
-const DEFAULTS = { waveScale: 5, ripple: 1, waveDir: 9, waveAmp: 42, waveSpeed: 12, horizon: 49, lightDir: 136, depth: 6, tint: 0, turbidity: 49 };
+const DEFAULTS = { waveScale: 5, ripple: 1, waveDir: 9, waveAmp: 42, waveSpeed: 12, horizon: 49, lightDir: 136, depth: 6, tint: 0, turbidity: 49, timeOfDay: 70, timeInt: 55, mood: 35, vig: 25 };
 const IDS = Object.keys(DEFAULTS);
 const UNIT = { waveDir: '°', lightDir: '°' };
 
@@ -78,10 +78,36 @@ function hsl(h, s, l) {
   return [f(0), f(8), f(4)];
 }
 
+// ── 時間帯の光：夜明け(0)→朝→昼(50)→夕方→夕暮れ(100)。太陽の高さ・光の色・水平線のにじみ・全体の色味と明るさを一緒に動かす
+const TK = [[0, 8, [1, .78, .72], [1, .70, .62], [1.02, .95, 1.00], .95], [.25, 28, [1, .94, .84], [.95, .88, .78], [1.00, .98, .94], 1.0], [.5, 62, [1, 1, 1], [.80, .90, 1], [.98, 1.00, 1.03], 1.05], [.75, 14, [1, .72, .42], [1, .62, .30], [1.08, .94, .80], .95], [1, 3, [.95, .50, .60], [.85, .40, .55], [1.00, .84, .92], .82]];
+function timeParams(t, k) {   // t:0〜1（時間帯）、k:0〜1（TIME INTENSITY＝どれだけ効かせるか）
+  t = Math.min(1, Math.max(0, t)); const i = Math.min(3, Math.floor(t * 4)), f = t * 4 - i, a = TK[i], b = TK[i + 1];
+  const m = (x, y) => x + (y - x) * f, v = (x, y) => x.map((q, j) => m(q, y[j])), mix = (n, x) => n + (x - n) * k;
+  return { elev: mix(35, m(a[1], b[1])), light: v(a[2], b[2]).map((q) => mix(1, q)), glow: v(a[3], b[3]).map((q) => mix(.9, q)), tint: v(a[4], b[4]).map((q) => mix(1, q)), expo: mix(1, m(a[5], b[5])) };
+}
+
+function post(o, lw, lh, sc, w, h, hy, p, TP) {   // 仕上げ：光のにじみ（固定・控えめ）→時間帯の色味→MOOD→VIGNETTE
+  const mood = p.mood / 100, vig = p.vig / 100, glow = 0.30, G = TP.glow, Li = TP.light, Ti = TP.tint, k = TP.expo;
+  for (let ly = 0; ly < lh; ly++) {
+    const y = ly / sc, band = Math.exp(-Math.abs(y - hy) / h * 5.5), dy = (y / h - 0.5) * 2;
+    for (let lx = 0; lx < lw; lx++) {
+      const i = (ly * lw + lx) * 4, dx = (lx / sc / w - 0.5) * 2;
+      let r = o[i], g = o[i + 1], b = o[i + 2];
+      const lum = (0.3 * r + 0.59 * g + 0.11 * b) / 255, gl = (glow * band * 0.22 + glow * Math.max(0, lum - 0.72) * 0.55) * 255;
+      r = (r + G[0] * gl) * Ti[0] * k; g = (g + G[1] * gl) * Ti[1] * k; b = (b + G[2] * gl) * Ti[2] * k;
+      const sh = (1 - lum) * mood, hi = lum * mood, c = 1 + 0.5 * mood;
+      r = ((r - 115) * c + 115) * (1 - 0.28 * sh) + Li[0] * 28 * hi; g = ((g - 115) * c + 115) * (1 - 0.08 * sh) + Li[1] * 20 * hi; b = ((b - 115) * c + 115) * (1 + 0.10 * sh) + Li[2] * 10 * hi;
+      const v = Math.min(1, Math.max(0, (Math.sqrt(dx * dx + dy * dy) - 0.55) / 0.9)), f = 1 - vig * 0.7 * v * v;
+      o[i] = r * f; o[i + 1] = g * f; o[i + 2] = b * f;
+    }
+  }
+}
+
 let outBuf = null, offCv = null;
 function render(scale = 1) {
   const w = cv.width, h = cv.height;
   const p = {}; IDS.forEach((id) => { p[id] = +$(id).value; });
+  const TP = timeParams(p.timeOfDay / 100, p.timeInt / 100);
   tAcc = p.waveSpeed / 100 * 25;                          // 手動の位置 → 波の位相
   const waves = buildWaves(p), nW = waves.length;
   const hMax = waves.reduce((s, v) => s + v.a, 0) || 1;
@@ -95,7 +121,9 @@ function render(scale = 1) {
   const trans = [Math.exp(-d * 3.2), Math.exp(-d * 1.2), Math.exp(-d * 0.45)]; // 赤から先に吸収
   const mixT = 1 - Math.exp(-d * 2.2);
   const lr = (p.lightDir - 90) * Math.PI / 180;
-  let Hx = Math.cos(lr) * 0.82, Hy = Math.sin(lr) * 0.82, Hz = 1.57;   // 光(仰角35°)と視線の中間ベクトル
+  const sunK = Math.min(1, Math.max(0.33, 1 - (TP.elev - 35) / 40));   // 太陽が高いほど、きらめきの面積が広がりすぎないよう抑える
+  const el = TP.elev * Math.PI / 180;   // 時間帯で決まる太陽の高さ
+  let Hx = Math.cos(lr) * Math.cos(el), Hy = Math.sin(lr) * Math.cos(el), Hz = 1 + Math.sin(el);   // 光と視線の中間ベクトル
   const hn = Math.hypot(Hx, Hy, Hz); Hx /= hn; Hy /= hn; Hz /= hn;
   const showHeight = $('showHeight').checked;
   const B = srcData.below, S = srcData.surf;
@@ -133,12 +161,13 @@ function render(scale = 1) {
             r = r * (1 - R) + T[0] * R; g = g * (1 - R) + T[1] * R; b = b * (1 - R) + T[2] * R; }
           const nx = -gx * slopeK, ny = -gy * slopeK;                       // きらめき：法線が光の方向を向く所
           const dt = (nx * Hx + ny * Hy + Hz) / Math.sqrt(nx * nx + ny * ny + 1);
-          if (dt > 0.8) { const sp = Math.pow(dt, 90) * (0.35 + R * 0.9) * 230 * (1 - u * 0.5); r += sp; g += sp * 0.96; b += sp * 0.88; }
+          if (dt > 0.8) { const sp = Math.pow(dt, 90) * (0.35 + R * 0.9) * 230 * (1 - u * 0.5) * sunK; r += sp * TP.light[0]; g += sp * TP.light[1]; b += sp * TP.light[2]; }
         }
       }
       o[i] = r; o[i + 1] = g; o[i + 2] = b; o[i + 3] = 255;
     }
   }
+  post(o, lw, lh, scale, w, h, hy, p, TP);
   if (scale === 1) { ctx.putImageData(outBuf, 0, 0); return; }
   if (!offCv) offCv = document.createElement('canvas');
   offCv.width = lw; offCv.height = lh;

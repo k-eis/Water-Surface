@@ -152,6 +152,20 @@ input[type=range]::-moz-range-thumb { width:14px; height:14px; border-radius:50%
         <input type="range" id="lightDir" min="0" max="359" value="136">
       </div>
       <div class="ctrl-group">
+        <div class="ctrl-label"><span class="section-title">TIME <span class="jp-small" style="font-family:var(--sans)">時間帯</span></span></div>
+        <div class="ctrl-label"><span class="name">TIME OF DAY <span class="jp-small">夜明け←→夕暮れ</span></span><span class="val" id="timeOfDayVal">70</span></div>
+        <input type="range" id="timeOfDay" min="0" max="100" value="70">
+        <div class="ctrl-label"><span class="name">TIME INTENSITY <span class="jp-small">時間帯の効き具合</span></span><span class="val" id="timeIntVal">55</span></div>
+        <input type="range" id="timeInt" min="0" max="100" value="55">
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label"><span class="section-title">MOOD <span class="jp-small" style="font-family:var(--sans)">雰囲気</span></span></div>
+        <div class="ctrl-label"><span class="name">MOOD <span class="jp-small">影と光の色のコントラスト</span></span><span class="val" id="moodVal">35</span></div>
+        <input type="range" id="mood" min="0" max="100" value="35">
+        <div class="ctrl-label"><span class="name">VIGNETTE <span class="jp-small">周辺を落とす</span></span><span class="val" id="vigVal">25</span></div>
+        <input type="range" id="vig" min="0" max="100" value="25">
+      </div>
+      <div class="ctrl-group">
         <div class="ctrl-label"><span class="section-title">WATER <span class="jp-small" style="font-family:var(--sans)">水</span></span></div>
         <div class="ctrl-label"><span class="name">DEPTH <span class="jp-small">水深</span></span><span class="val" id="depthVal">6</span></div>
         <input type="range" id="depth" min="0" max="100" value="6">
