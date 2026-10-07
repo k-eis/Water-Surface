@@ -9,7 +9,7 @@ const cv = $('outputCanvas');
 const ctx = cv.getContext('2d', { willReadFrequently: true });
 const downloadBtn = $('downloadBtn');
 
-const DEFAULTS = { waveScale: 50, ripple: 40, waveDir: 0, waveAmp: 50, waveSpeed: 0, horizon: 35, lightDir: 0, depth: 30, tint: 15, turbidity: 20 };
+const DEFAULTS = { waveScale: 5, ripple: 1, waveDir: 9, waveAmp: 42, waveSpeed: 12, horizon: 49, lightDir: 136, depth: 6, tint: 0, turbidity: 49 };
 const IDS = Object.keys(DEFAULTS);
 const UNIT = { waveDir: '°', lightDir: '°' };
 
