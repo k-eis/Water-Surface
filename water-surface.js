@@ -1,6 +1,6 @@
 // ── Water Surface エンジン（k-eis DESIGN FILTER 008・無料版 / Canvas 2D）
 // 全ての効果は「波の高さマップ」から導く。正弦波の重ね合わせなので傾きも解析的に求まり、位相を進めるだけで波が流れる。
-//   WAVE      : SCALE / RIPPLE / DIRECTION / AMPLITUDE / SPEED
+//   WAVE      : SCALE / RIPPLE / DIRECTION / AMPLITUDE / FLOW（手動。自動再生はしない）
 //   REFLECTION: HORIZON（水平線の位置。上は水面の写真そのまま、下は水で、映り込みは水平線で上下反転）
 //   LIGHT     : LIGHT DIRECTION（光源の方向。波の傾きがその向きを向いた所がきらめく）
 //   WATER     : DEPTH（吸収：赤から先に減る）/ TURBIDITY（濁り）/ WATER TINT（水自体の色味）
@@ -82,6 +82,7 @@ let outBuf = null, offCv = null;
 function render(scale = 1) {
   const w = cv.width, h = cv.height;
   const p = {}; IDS.forEach((id) => { p[id] = +$(id).value; });
+  tAcc = p.waveSpeed / 100 * 25;                          // 手動の位置 → 波の位相
   const waves = buildWaves(p), nW = waves.length;
   const hMax = waves.reduce((s, v) => s + v.a, 0) || 1;
   const slopeK = 0.4 + p.waveAmp / 100 * 1.2;
@@ -146,23 +147,14 @@ function render(scale = 1) {
   ctx.drawImage(offCv, 0, 0, w, h);
 }
 
-// ── 再描画：SPEED=0は静止画（変更時のみ）、SPEED>0は動かす（動いている間は粗い解像度、止めたら高解像度）
-let raf = 0, anim = 0, lastT = 0;
-const speed = () => +$('waveSpeed').value;
-function requestRender() { if (anim) return; cancelAnimationFrame(raf); raf = requestAnimationFrame(() => render(1)); }
-function loop(now) {
-  tAcc += Math.min(0.05, (now - lastT) / 1000) * speed() / 100; lastT = now;
-  render(0.5);
-  anim = requestAnimationFrame(loop);
-}
-function updateMode() {
-  cancelAnimationFrame(anim); anim = 0;
-  if (speed() > 0) { lastT = performance.now(); anim = requestAnimationFrame(loop); } else render(1);
-}
+// ── 再描画：自動では動かない。WAVE FLOW のスライダーを手で動かしたときだけ、波の位置が変わる（動画のようには再生されない）
+let raf = 0;
+function requestRender() { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => render(1)); }
+function updateMode() { render(1); }
 
 IDS.forEach((id) => $(id).addEventListener('input', () => {
   $(id + 'Val').textContent = $(id).value + (UNIT[id] || '');
-  if (id === 'waveSpeed') updateMode(); else requestRender();
+  requestRender();
 }));
 $('showHeight').addEventListener('change', requestRender);
 
